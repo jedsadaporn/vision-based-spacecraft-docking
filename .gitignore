@@ -1,0 +1,31 @@
+# ROS 2
+ros2_ws/build/
+ros2_ws/install/
+ros2_ws/log/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Experiment outputs
+experiments/output/
+experiments/results/
+
+# Large generated data
+*.bag
+*.db3
+*.mp4
+*.avi
+
+# Python tooling
+.pytest_cache/
+.mypy_cache/
