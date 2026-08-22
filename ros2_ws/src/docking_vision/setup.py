@@ -21,6 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'image_publisher = docking_vision.image_publisher:main',
+            'image_detector = docking_vision.image_detector:main',
         ],
     },
 )

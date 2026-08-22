@@ -1,0 +1,6 @@
+~/space_robotics/vision-based-spacecraft-docking/ros2_ws$
+
+source /opt/ros/foxy/setup.bash
+source ~/space_robotics/vision-based-spacecraft-docking/ros2_ws/install/setup.bash
+
+ros2 pkg list | grep docking

@@ -2,6 +2,7 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image 
 import numpy as np
+from docking_vision.synthetic_target import create_target
 
 
 class ImagePublisherNode(Node):
@@ -17,12 +18,13 @@ class ImagePublisherNode(Node):
     def timer_callback(self):
         image_msg = Image()
         image = np.zeros((480, 640), dtype=np.uint8)
+        image_with_target = create_target(image)
         # print(len(image.tobytes()))
         # print(image.shape)
         # print(image.dtype)
         # print(image.size)
         # print(image.nbytes)
-        data = image.tobytes()
+        data = image_with_target.tobytes()
         # print(type(data))
         # print(len(data))
         # print(data[:10])
