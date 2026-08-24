@@ -10,6 +10,8 @@ def detect_target(image):
     threshold_value, binary_image = cv2.threshold(image, threshold, 255, cv2.THRESH_BINARY)
     contours, hierarchy = cv2.findContours(binary_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
+    # เราอยากได้: contour ที่น่าจะเป็น docking target
+    # contour ที่มีพื้นที่เหมาะสม/ใหญ่ที่สุด
     for i, contour in enumerate(contours):
         print("Contour:", i)
         print("Number of points:", len(contour))
@@ -25,24 +27,27 @@ def detect_target(image):
     x1, y1, box_w, box_h = cv2.boundingRect(contour)
     # print(x1)
     # print(y1)
-    # print(box_w)
+    print("box_w, box_h :", box_w, box_h)
     # print(box_h)
 
     cx = x1 + box_w // 2
     cy = y1 + box_h // 2
-    print('cx = ', cx)
-    print('cy = ', cy)
+    print('cx , cy : ', cx, cy)
+    # print('cy = ', cy)
 
     error_x = cx - 320
     error_y = cy - 240
-    print('error x = ', error_x)
-    print('error y = ', error_y)
+    # print('error x = ', error_x)
+    # print('error y = ', error_y)
 
     x2 = x1 + box_w
     y2 = y1 + box_h
     # print(x2)
     # print(y2)
 
-
-
-    return cx, cy
+    z_from_width = 128 / box_w 
+    z_from_height = 192 / box_h 
+    print('error x, error y , error z :', error_x, error_y, z_from_width)
+    
+    
+    return cx, cy, z_from_width

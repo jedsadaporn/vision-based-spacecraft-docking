@@ -2,23 +2,47 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image 
 import numpy as np
-from docking_vision.synthetic_target import create_target
+from docking_vision.synthetic_target import create_target, SpacecraftState
+from geometry_msgs.msg import Twist
 
 
 class ImagePublisherNode(Node):
     def __init__(self):
         super().__init__('image_publisher_node')
         self.image_publisher = self.create_publisher(Image, '/camera/image_raw', 10)
+        self.create_subscription(Twist, '/cmd_vel', self.command_callback, 10)
         # freq = 1 / period
         # Want Freq = 10hz (10/sec), period = 0.1
         # self.create_timer(0.1, self.timer_callback)
         # 1/SEC
-        self.create_timer(1, self.timer_callback)
+        self.dt = 0.1
+        self.create_timer(self.dt, self.timer_callback)
+        self.command_x = 0.0
+        self.command_y = 0.0
+        self.command_z = 0.0
+        self.state = SpacecraftState(-80, -50, 2)
+        # (80, 50, 2)
+        # (-80, -50, 2)
+        # (50, -30, 0.5)
+        # (-100, 70, 1.5)
+
+    def command_callback(self, msg):
+        self.command_x = msg.linear.x
+        self.command_y = msg.linear.y
+        self.command_z = msg.linear.z
+
+        print("Received command:")
+        print(self.command_x, self.command_y, self.command_z)
+        
 
     def timer_callback(self):
         image_msg = Image()
         image = np.zeros((480, 640), dtype=np.uint8)
-        image_with_target = create_target(image)
+        self.state.x += self.command_x * self.dt
+        self.state.y += self.command_y * self.dt
+        self.state.z += self.command_z * self.dt
+        print("State x, y, z :", self.state.x, self.state.y, self.state.z)
+        image_with_target = create_target(image,self.state)
         # print(len(image.tobytes()))
         # print(image.shape)
         # print(image.dtype)
