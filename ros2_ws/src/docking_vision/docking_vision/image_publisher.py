@@ -18,27 +18,62 @@ class ImagePublisherNode(Node):
         # 1/SEC
         self.dt = 0.1
         self.create_timer(self.dt, self.timer_callback)
-        self.command_x = 0.0
-        self.command_y = 0.0
-        self.command_z = 0.0
+        # ==================================================
+        # Initial condition
+        # Change these values for each experiment
+        # ==================================================
+        self.initial_x = 80.0
+        self.initial_y = 50.0
+        self.initial_z = 2.0
+
+        # # Initial 2
+        # self.initial_x = -80.0
+        # self.initial_y = -50.0
+        # self.initial_z = 2.0
+
+        # # Initial 3
+        # self.initial_x = 50.0
+        # self.initial_y = -30.0
+        # self.initial_z = 0.5
+
+        # # Initial 4
+        # self.initial_x = -100.0
+        # self.initial_y = 70.0
+        # self.initial_z = 1.5
+
+        # Target position
+        self.x_target = 0.0
+        self.y_target = 0.0
+        self.z_target = 1.0
+
+        # Docking tolerance
         self.tolerance_x = 1.0
         self.tolerance_y = 1.0
         self.tolerance_z = 0.05
-        self.initial_x = -80
-        self.initial_y = -50
-        self.initial_z = 2
+
         self.docking_success = False
-        self.state = SpacecraftState(80, 50, 2)
+
+        # ==================================================
+        # State
+        # ==================================================
+        self.state = SpacecraftState(
+            self.initial_x,
+            self.initial_y,
+            self.initial_z
+        )
+
         # (80, 50, 2)
         # (-80, -50, 2)
         # (50, -30, 0.5)
         # (-100, 70, 1.5)
+
+        self.command_x = 0.0
+        self.command_y = 0.0
+        self.command_z = 0.0
+        
         self.history = []
         self.time = 0
         self.step = 0
-        self.x_target = 0
-        self.y_target = 0
-        self.z_target = 1
 
         #Create csv File trajectory docking position
         self.csv_file = open('docking_position.csv', 'w', newline='')
@@ -82,24 +117,47 @@ class ImagePublisherNode(Node):
     
         image_msg = Image()
         image = np.zeros((480, 640), dtype=np.uint8)
+
+        # ==========================================
+        # Update spacecraft state
+        # ==========================================
         self.state.x += self.command_x * self.dt
         self.state.y += self.command_y * self.dt
         self.state.z += self.command_z * self.dt
+
         print("State x, y, z :", self.state.x, self.state.y, self.state.z)
-        image_with_target = create_target(image,self.state)
+
+        # ==========================================
+        # Create synthetic image
+        # ==========================================
+        image_with_target = create_target(
+            image,
+            self.state
+        )
+
         self.step +=1 
         self.time = self.step * self.dt
+
+        # ==========================================
+        # Calculate state error
+        # ==========================================
         error_x = self.state.x - self.x_target
         error_y = self.state.y - self.y_target
         error_z = self.state.z - self.z_target
 
+
+        # ==========================================
+        # Check docking condition
+        # ==========================================
         docked = (
-            abs(error_x) < self.tolerance_x
-            and abs(error_y) < self.tolerance_y
-            and abs(error_z) < self.tolerance_z
+            abs(error_x) <= self.tolerance_x
+            and abs(error_y) <= self.tolerance_y
+            and abs(error_z) <= self.tolerance_z
         )
         
-        # save trajectory
+        # ==========================================
+        # Save trajectory
+        # ==========================================
         self.history.append({
             "time": self.time,
             "x": self.state.x,
@@ -124,7 +182,9 @@ class ImagePublisherNode(Node):
         if(self.step % 10 == 0):
             print(self.history[-1])
 
-         # Docking success
+        # ==========================================
+        # Docking success
+        # ==========================================
         if docked:
             self.docking_success = True
 
@@ -142,8 +202,17 @@ class ImagePublisherNode(Node):
             self.csv_file.flush()
             self.exp_sum_file.flush()
 
+            print("================================")
             print("DOCKING SUCCESS")
             print("Time to dock:", self.time)
+            print(
+                "Final state:",
+                self.state.x,
+                self.state.y,
+                self.state.z
+            )
+            print("================================")
+
 
 
         # print(len(image.tobytes()))
@@ -156,6 +225,9 @@ class ImagePublisherNode(Node):
         # print(len(data))
         # print(data[:10])
         
+        # ==========================================
+        # Publish image
+        # ==========================================
         image_msg.height = 480
         image_msg.width = 640
         #string encoding       # Encoding of pixels -- channel meaning, ordering, size

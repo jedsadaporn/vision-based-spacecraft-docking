@@ -25,8 +25,9 @@ class ImageDetectorNode(Node):
     def timer_callback(self):
         if self.docking_success:
             return
-        
+
         msg = Twist()
+
         msg.linear.x = float(self.command_x)
         msg.linear.y = float(self.command_y)
         msg.linear.z = float(self.command_z)
@@ -34,47 +35,79 @@ class ImageDetectorNode(Node):
         self.cmd_pub.publish(msg)
 
     def image_callback(self, msg):
+        # ==========================================
+        # Stop processing after docking
+        # ==========================================
+        if self.docking_success:
+            return
         # print(msg)
+
         cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='mono8')
         # image = cv2.imread(cv_image,cv2.IMREAD_GRAYSCALE)
         cv2.imshow('Binary Image', cv_image)
         
         print("Received Image")
         print("shape: ", cv_image.shape)
+
         result = detect_target(cv_image)
+
+        # ==========================================
+        # Target not found
+        # ==========================================
         if result is None:
             print("Target Not Found")
         else:
+            # ==========================================
+            # Target detected
+            # ==========================================
             cx, cy, z = result
             print("Target:", cx, cy, z)
+
+            # Image-space error
             error_x = cx - 320
             error_y = cy - 240
+
+            # Distance error
             error_z = z - 1.0
+
+            # ==========================================
+            # Controller
+            # ==========================================
             self.command_x, self.command_y, self.command_z = control(error_x, error_y, error_z)
+
+            # ==========================================
+            # Docking condition
+            # ==========================================
             tolerance_x = 5.0      # pixels
             tolerance_y = 5.0      # pixels
             tolerance_z = 0.05     # estimated distance
-            if abs(error_z) < tolerance_z and abs(error_x) < tolerance_x and abs(error_y) < tolerance_y:
+            docked = (
+                abs(error_x) <= tolerance_x
+                and abs(error_y) <= tolerance_y
+                and abs(error_z) <= tolerance_z
+            )
+            if docked:
                 self.command_z = 0.0
                 self.command_x = 0.0
                 self.command_y = 0.0
                 self.docking_success = True
+                print("================================")
                 print("SPACE DOCKING SUCCESS")
-            print("Target:", cx, cy, z)
+                print("================================")
 
-            print(
-                "Error:",
-                error_x,
-                error_y,
-                error_z
-            )
+        print("Command:")
+        print(
+            self.command_x,
+            self.command_y,
+            self.command_z
+        )
 
-            print(
-                "Command:",
-                self.command_x,
-                self.command_y,
-                self.command_z
-            )
+        print(
+            "Error:",
+            error_x,
+            error_y,
+            error_z
+        )
  
         #wait for key everytime callback not compactable with ros2
         # cv2.waitKey(0)
