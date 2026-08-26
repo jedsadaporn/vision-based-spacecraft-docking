@@ -20,10 +20,13 @@ class ImageDetectorNode(Node):
         self.command_x = 0.0
         self.command_y = 0.0
         self.command_z = 0.0
+        self.docking_success = False
 
     def timer_callback(self):
+        if self.docking_success:
+            return
+        
         msg = Twist()
-
         msg.linear.x = float(self.command_x)
         msg.linear.y = float(self.command_y)
         msg.linear.z = float(self.command_z)
@@ -50,11 +53,12 @@ class ImageDetectorNode(Node):
             self.command_x, self.command_y, self.command_z = control(error_x, error_y, error_z)
             tolerance_x = 5.0      # pixels
             tolerance_y = 5.0      # pixels
-            tolerance_z = 0.01     # estimated distance
+            tolerance_z = 0.05     # estimated distance
             if abs(error_z) < tolerance_z and abs(error_x) < tolerance_x and abs(error_y) < tolerance_y:
                 self.command_z = 0.0
                 self.command_x = 0.0
                 self.command_y = 0.0
+                self.docking_success = True
                 print("SPACE DOCKING SUCCESS")
             print("Target:", cx, cy, z)
 

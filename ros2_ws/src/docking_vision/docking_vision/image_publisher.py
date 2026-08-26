@@ -4,6 +4,7 @@ from sensor_msgs.msg import Image
 import numpy as np
 from docking_vision.synthetic_target import create_target, SpacecraftState
 from geometry_msgs.msg import Twist
+import csv
 
 
 class ImagePublisherNode(Node):
@@ -20,11 +21,51 @@ class ImagePublisherNode(Node):
         self.command_x = 0.0
         self.command_y = 0.0
         self.command_z = 0.0
-        self.state = SpacecraftState(-80, -50, 2)
+        self.tolerance_x = 1.0
+        self.tolerance_y = 1.0
+        self.tolerance_z = 0.05
+        self.initial_x = -80
+        self.initial_y = -50
+        self.initial_z = 2
+        self.docking_success = False
+        self.state = SpacecraftState(80, 50, 2)
         # (80, 50, 2)
         # (-80, -50, 2)
         # (50, -30, 0.5)
         # (-100, 70, 1.5)
+        self.history = []
+        self.time = 0
+        self.step = 0
+        self.x_target = 0
+        self.y_target = 0
+        self.z_target = 1
+
+        #Create csv File trajectory docking position
+        self.csv_file = open('docking_position.csv', 'w', newline='')
+        self.csv_writer = csv.writer(self.csv_file)
+        self.csv_writer.writerow([
+            'time',
+            'x',
+            'y',
+            'z',
+            'error_x',
+            'error_y',
+            'error_z'
+        ])
+
+        #Create csv experiment_summary
+        self.exp_sum_file = open('experiment_summary.csv', 'w', newline='')
+        self.exp_sum_writer = csv.writer(self.exp_sum_file)
+        self.exp_sum_writer.writerow([
+            'initial_x',
+            'initial_y',
+            'initial_z',
+            'time_to_dock',
+            'final_x',
+            'final_y',
+            'final_z',
+            'success'
+        ])
 
     def command_callback(self, msg):
         self.command_x = msg.linear.x
@@ -36,6 +77,9 @@ class ImagePublisherNode(Node):
         
 
     def timer_callback(self):
+        if self.docking_success:
+            return
+    
         image_msg = Image()
         image = np.zeros((480, 640), dtype=np.uint8)
         self.state.x += self.command_x * self.dt
@@ -43,6 +87,65 @@ class ImagePublisherNode(Node):
         self.state.z += self.command_z * self.dt
         print("State x, y, z :", self.state.x, self.state.y, self.state.z)
         image_with_target = create_target(image,self.state)
+        self.step +=1 
+        self.time = self.step * self.dt
+        error_x = self.state.x - self.x_target
+        error_y = self.state.y - self.y_target
+        error_z = self.state.z - self.z_target
+
+        docked = (
+            abs(error_x) < self.tolerance_x
+            and abs(error_y) < self.tolerance_y
+            and abs(error_z) < self.tolerance_z
+        )
+        
+        # save trajectory
+        self.history.append({
+            "time": self.time,
+            "x": self.state.x,
+            "y": self.state.y,
+            "z": self.state.z,
+            "error_x": error_x,
+            "error_y": error_y,
+            "error_z": error_z
+        })
+        #Write history data to csv file and use this file to plot the graph
+        self.csv_writer.writerow([
+            self.time,
+            self.state.x,
+            self.state.y,
+            self.state.z,
+            error_x,
+            error_y,
+            error_z
+        ])
+        self.csv_file.flush()
+
+        if(self.step % 10 == 0):
+            print(self.history[-1])
+
+         # Docking success
+        if docked:
+            self.docking_success = True
+
+            self.exp_sum_writer.writerow([
+                self.initial_x,
+                self.initial_y,
+                self.initial_z,
+                self.time,
+                self.state.x,
+                self.state.y,
+                self.state.z,
+                True
+            ])
+
+            self.csv_file.flush()
+            self.exp_sum_file.flush()
+
+            print("DOCKING SUCCESS")
+            print("Time to dock:", self.time)
+
+
         # print(len(image.tobytes()))
         # print(image.shape)
         # print(image.dtype)
@@ -78,9 +181,13 @@ class ImagePublisherNode(Node):
 def main(args=None):
     rclpy.init(args=args)
     node = ImagePublisherNode()
-    rclpy.spin(node)
-    node.destroy_node()
-    rclpy.shutdown()
+    try:
+        rclpy.spin(node)
+    finally:
+        node.csv_file.close()
+        node.exp_sum_file.close()
+        node.destroy_node()
+        rclpy.shutdown()
 
 if __name__=='__main__':
     main()

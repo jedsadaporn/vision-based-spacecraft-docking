@@ -1,7 +1,7 @@
 import numpy as np
 
 def control(error_x, error_y, error_z):
-    Kp = 0.01 #"เห็น error เท่านี้ จะตอบสนองแรงแค่ไหน" ใหญ่ขึ้นเคลื่อนที่เข้าหา target ได้ไวขึ้น
+    Kp = 0.1 #"เห็น error เท่านี้ จะตอบสนองแรงแค่ไหน" ใหญ่ขึ้นเคลื่อนที่เข้าหา target ได้ไวขึ้น
 
     command_x = -Kp * error_x
     command_y = -Kp * error_y
