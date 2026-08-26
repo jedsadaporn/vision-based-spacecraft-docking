@@ -22,6 +22,8 @@ cy = height // 2 + translation_center_y
 box_w = int(128 * target_size)
 box_h = int(192 * target_size)
 
+#x1 y1 = upper left position
+#x2 y2 = lower rifgt position
 x1 = cx - box_w // 2
 y1 = cy - box_h // 2
 x2 = cx + box_w // 2
