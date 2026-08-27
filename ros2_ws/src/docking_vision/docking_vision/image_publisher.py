@@ -5,26 +5,43 @@ import numpy as np
 from docking_vision.synthetic_target import create_target, SpacecraftState
 from geometry_msgs.msg import Twist
 import csv
+from datetime import datetime
+import os
 
 
 class ImagePublisherNode(Node):
     def __init__(self):
         super().__init__('image_publisher_node')
+        self.declare_parameter('kp', 0.1)
+        self.kp = self.get_parameter('kp').value
+        self.run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+        self.declare_parameter('trial_id', 0)
+        self.trial_id =self.get_parameter('trial_id').value
         self.image_publisher = self.create_publisher(Image, '/camera/image_raw', 10)
         self.create_subscription(Twist, '/cmd_vel', self.command_callback, 10)
+        self.declare_parameter('initial_x', 80.0)
+        self.initial_x = self.get_parameter('initial_x').value
+        self.declare_parameter('initial_y', 50.0)
+        self.initial_y = self.get_parameter('initial_y').value
+        self.declare_parameter('initial_z', 2.0)
+        self.initial_z = self.get_parameter('initial_z').value
         # freq = 1 / period
         # Want Freq = 10hz (10/sec), period = 0.1
         # self.create_timer(0.1, self.timer_callback)
         # 1/SEC
-        self.dt = 0.1
+        self.declare_parameter('dt', 0.1)
+        self.dt = self.get_parameter('dt').value
+        # self.dt = 0.1
         self.create_timer(self.dt, self.timer_callback)
+
+        self.summary_written = False
         # ==================================================
         # Initial condition
         # Change these values for each experiment
         # ==================================================
-        self.initial_x = 80.0
-        self.initial_y = 50.0
-        self.initial_z = 2.0
+        # self.initial_x = 80.0
+        # self.initial_y = 50.0
+        # self.initial_z = 2.0
 
         # # Initial 2
         # self.initial_x = -80.0
@@ -42,14 +59,28 @@ class ImagePublisherNode(Node):
         # self.initial_z = 1.5
 
         # Target position
-        self.x_target = 0.0
-        self.y_target = 0.0
-        self.z_target = 1.0
+        self.declare_parameter('target_x', 0.0)
+        self.x_target = self.get_parameter('target_x').value
+        self.declare_parameter('target_y', 0.0)
+        self.y_target = self.get_parameter('target_y').value
+        self.declare_parameter('target_z', 1.0)
+        self.z_target = self.get_parameter('target_z').value
+
+        # self.x_target = 0.0
+        # self.y_target = 0.0
+        # self.z_target = 1.0
 
         # Docking tolerance
-        self.tolerance_x = 1.0
-        self.tolerance_y = 1.0
-        self.tolerance_z = 0.05
+        self.declare_parameter('tolerance_x', 1.0)
+        self.tolerance_x = self.get_parameter('tolerance_x').value
+        self.declare_parameter('tolerance_y', 1.0)
+        self.tolerance_y = self.get_parameter('tolerance_y').value
+        self.declare_parameter('tolerance_z', 0.05)
+        self.tolerance_z = self.get_parameter('tolerance_z').value
+
+        # self.tolerance_x = 1.0
+        # self.tolerance_y = 1.0
+        # self.tolerance_z = 0.05
 
         self.docking_success = False
 
@@ -75,32 +106,51 @@ class ImagePublisherNode(Node):
         self.time = 0
         self.step = 0
 
-        #Create csv File trajectory docking position
-        self.csv_file = open('docking_position.csv', 'w', newline='')
-        self.csv_writer = csv.writer(self.csv_file)
-        self.csv_writer.writerow([
-            'time',
-            'x',
-            'y',
-            'z',
-            'error_x',
-            'error_y',
-            'error_z'
-        ])
+        #Create csv File trajectory docking position and #Create csv experiment_summary
+        trajectory_exists = os.path.exists('docking_position.csv')
+        if trajectory_exists:
+            #append
+            self.csv_file = open('docking_position.csv', 'a', newline='')
+            self.csv_writer = csv.writer(self.csv_file)
+        else:
+            #write
+            self.csv_file = open('docking_position.csv', 'w', newline='')
+            self.csv_writer = csv.writer(self.csv_file)
+            self.csv_writer.writerow([
+                'run_id',
+                'trial_id',
+                'kp',
+                'time',
+                'x',
+                'y',
+                'z',
+                'error_x',
+                'error_y',
+                'error_z'
+            ])
 
-        #Create csv experiment_summary
-        self.exp_sum_file = open('experiment_summary.csv', 'w', newline='')
-        self.exp_sum_writer = csv.writer(self.exp_sum_file)
-        self.exp_sum_writer.writerow([
-            'initial_x',
-            'initial_y',
-            'initial_z',
-            'time_to_dock',
-            'final_x',
-            'final_y',
-            'final_z',
-            'success'
-        ])
+        summary_exists = os.path.exists('experiment_summary.csv')
+        if summary_exists:
+            #append
+            self.exp_sum_file = open('experiment_summary.csv', 'a', newline='')
+            self.exp_sum_writer = csv.writer(self.exp_sum_file)
+        else:
+            #write
+            self.exp_sum_file = open('experiment_summary.csv', 'w', newline='')
+            self.exp_sum_writer = csv.writer(self.exp_sum_file)
+            self.exp_sum_writer.writerow([
+                'run_id',
+                'trial_id',
+                'kp',
+                'initial_x',
+                'initial_y',
+                'initial_z',
+                'time_to_dock',
+                'final_x',
+                'final_y',
+                'final_z',
+                'success'
+            ])
 
     def command_callback(self, msg):
         self.command_x = msg.linear.x
@@ -169,6 +219,9 @@ class ImagePublisherNode(Node):
         })
         #Write history data to csv file and use this file to plot the graph
         self.csv_writer.writerow([
+            self.run_id,
+            self.trial_id,
+            self.kp,
             self.time,
             self.state.x,
             self.state.y,
@@ -189,6 +242,9 @@ class ImagePublisherNode(Node):
             self.docking_success = True
 
             self.exp_sum_writer.writerow([
+                self.run_id,
+                self.trial_id,
+                self.kp,
                 self.initial_x,
                 self.initial_y,
                 self.initial_z,
@@ -199,8 +255,8 @@ class ImagePublisherNode(Node):
                 True
             ])
 
-            self.csv_file.flush()
             self.exp_sum_file.flush()
+            self.summary_written = True
 
             print("================================")
             print("DOCKING SUCCESS")
@@ -212,7 +268,7 @@ class ImagePublisherNode(Node):
                 self.state.z
             )
             print("================================")
-
+            
 
 
         # print(len(image.tobytes()))
@@ -256,6 +312,22 @@ def main(args=None):
     try:
         rclpy.spin(node)
     finally:
+        if (node.summary_written == False):
+            node.exp_sum_writer.writerow([
+                node.run_id,
+                node.trial_id,
+                node.kp,
+                node.initial_x,
+                node.initial_y,
+                node.initial_z,
+                node.time,
+                node.state.x,
+                node.state.y,
+                node.state.z,
+                False
+            ])
+            node.exp_sum_file.flush()
+        
         node.csv_file.close()
         node.exp_sum_file.close()
         node.destroy_node()

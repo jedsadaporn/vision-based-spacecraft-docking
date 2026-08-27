@@ -11,6 +11,8 @@ from geometry_msgs.msg import Twist
 class ImageDetectorNode(Node):
     def __init__(self):
         super().__init__('image_detector_node')
+        self.declare_parameter('kp', 0.1)
+        self.kp = self.get_parameter('kp').value
         self.create_subscription(Image, '/camera/image_raw',self.image_callback, 10)
         self.cmd_pub = self.create_publisher(Twist,'/cmd_vel', 10)
         # 1/SEC
@@ -56,6 +58,11 @@ class ImageDetectorNode(Node):
         # ==========================================
         if result is None:
             print("Target Not Found")
+            self.command_x = 0.0
+            self.command_y = 0.0
+            self.command_z = 0.0
+            cv2.waitKey(1)
+            return
         else:
             # ==========================================
             # Target detected
@@ -73,7 +80,8 @@ class ImageDetectorNode(Node):
             # ==========================================
             # Controller
             # ==========================================
-            self.command_x, self.command_y, self.command_z = control(error_x, error_y, error_z)
+            print("Kp:", self.kp)
+            self.command_x, self.command_y, self.command_z = control(error_x, error_y, error_z, self.kp)
 
             # ==========================================
             # Docking condition

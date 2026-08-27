@@ -1,0 +1,46 @@
+image_detector_node:
+  ros__parameters:
+    kp: 0.2
+
+image_publisher_node:
+  ros__parameters:
+    kp: 0.2 
+    initial_x: -100.0
+    initial_y: 100.0
+    initial_z: 1.5
+    trial_id: 1
+
+    dt: 0.1
+
+    target_x: 0.0
+    target_y: 0.0
+    target_z: 1.0
+
+    tolerance_x: 1.0
+    tolerance_y: 1.0
+    tolerance_z: 0.05
+    
+
+# experiment:
+#   ros__parameters:
+#     trial_id: 1
+
+# # Initial 1
+# initial_x = 80.0
+# initial_y = 50.0
+# initial_z = 2.0
+
+# # Initial 2
+# initial_x = -80.0
+# initial_y = -50.0
+# initial_z = 2.0
+
+# # Initial 3
+# initial_x = 50.0
+# initial_y = -30.0
+# initial_z = 0.5
+
+# # Initial 4
+# initial_x = -100.0
+# initial_y = 70.0
+# initial_z = 1.5
