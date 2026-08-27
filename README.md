@@ -4,6 +4,8 @@ A project-based learning project for developing a vision-based autonomous spacec
 
 ## Goal
 
+Build an end-to-end ROS 2 vision-based autonomous spacecraft docking system focused on practical Space Robotics and Robot Software Engineering skills. The first objective is to build a configurable, testable, and reproducible engineering MVP. Research-grade pose estimation, state estimation, spacecraft dynamics, advanced GNC, and robustness studies will be developed as later extensions.
+
 Develop an autonomous spacecraft docking system that can:
 
 1. Detect a target spacecraft using a camera
@@ -12,24 +14,43 @@ Develop an autonomous spacecraft docking system that can:
 4. Control the chaser spacecraft toward the docking port
 5. Perform autonomous docking in simulation
 
-## Learning Areas
+## Engineering Skills — MVP
 
 - ROS 2
-- C++ / Python
+- Python
 - Computer Vision
-- Camera Models
-- Pose Estimation
 - Coordinate Frames
-- State Estimation
-- Relative Navigation
+- Relative Position / Navigation
 - Visual Servoing
-- Guidance, Navigation and Control
-- Spacecraft Dynamics
+- Basic GNC
+- Robot Software Architecture
+- Simulation / Gazebo
+- Testing and Debugging
+- Logging and Configuration
 - Autonomous Docking
+
+## Research Extensions
+
+- 6-DoF Pose Estimation
+- State Estimation / EKF
+- Advanced Relative Navigation
+- Spacecraft Dynamics
+- Advanced GNC
+- Robustness / Uncertainty
+- Research-grade Experimental Evaluation
 
 ## Project Status
 
-🚧 Initial setup
+🟢 Core closed-loop MVP development
+
+Core ROS 2 system          ✅
+Docking logic              ✅
+Safety / failure handling  ✅
+Sanity validation          ✅
+Engineering framework      🚧
+Gazebo integration         ⏳
+MVP final demo             ⏳
+Research extensions        ⏳
 
 ## Planned Pipeline
 
@@ -48,6 +69,38 @@ Guidance / Controller
 Spacecraft Motion
   ↓
 Docking
+
+### MVP Pipeline
+
+Camera
+↓
+Target Detection
+↓
+Relative Position
+↓
+Visual Servoing / Controller
+↓
+Spacecraft Motion
+↓
+Docking
+
+### Future Research Pipeline
+
+Camera
+↓
+Feature / Marker Detection
+↓
+6-DoF Pose Estimation
+↓
+State Estimation
+↓
+Relative Navigation
+↓
+Advanced GNC
+↓
+Spacecraft Dynamics
+↓
+Robust Autonomous Docking
 
 ## Repository Structure
 
