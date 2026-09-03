@@ -5,9 +5,9 @@ image_detector_node:
 image_publisher_node:
   ros__parameters:
     kp: 0.2 
-    initial_x: -100.0
-    initial_y: 100.0
-    initial_z: 1.5
+    initial_x: 50.0
+    initial_y: -30.0
+    initial_z: 0.5
     trial_id: 1
 
     dt: 0.1
@@ -25,10 +25,20 @@ image_publisher_node:
 #   ros__parameters:
 #     trial_id: 1
 
-# # Initial 1
+# TC 1
 # initial_x = 80.0
 # initial_y = 50.0
 # initial_z = 2.0
+
+# TC 2
+# initial_x = -100.0
+# initial_y = -100.0
+# initial_z = 1.5
+
+# TC 3
+# initial_x = 50.0
+# initial_y = -30.0
+# initial_z = 0.5
 
 # # Initial 2
 # initial_x = -80.0
