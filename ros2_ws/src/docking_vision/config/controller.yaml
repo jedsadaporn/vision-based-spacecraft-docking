@@ -8,7 +8,7 @@ image_publisher_node:
     initial_x: 50.0
     initial_y: -30.0
     initial_z: 0.5
-    trial_id: 1
+    trial_id: 3
 
     dt: 0.1
 
