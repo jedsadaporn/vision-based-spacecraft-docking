@@ -8,7 +8,7 @@ image_publisher_node:
     initial_x: 50.0
     initial_y: -30.0
     initial_z: 0.5
-    trial_id: 3
+    trial_id: 4
 
     dt: 0.1
 
@@ -20,6 +20,8 @@ image_publisher_node:
     tolerance_y: 1.0
     tolerance_z: 0.05
     
+    trajectory_file: "../experiments/experiment_result/docking_position.csv"
+    summary_file: "../experiments/experiment_result/experiment_summary.csv"
 
 # experiment:
 #   ros__parameters:

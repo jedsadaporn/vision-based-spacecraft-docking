@@ -39,4 +39,4 @@ target_image = cv2.circle(draw_target, (cx,cy), target_point, 255, 2)
 
 print(cx)
 print(cy)
-cv2.imwrite('target_medium.png', target_image)
+cv2.imwrite('experiments/debug_images/target_medium.png', target_image)

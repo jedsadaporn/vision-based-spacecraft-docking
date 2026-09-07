@@ -106,15 +106,19 @@ class ImagePublisherNode(Node):
         self.time = 0
         self.step = 0
 
+
+        self.declare_parameter('trajectory_file',"../experiments/experiment_result/docking_position.csv")
+        self.trajectory_file = self.get_parameter('trajectory_file').value
+
         #Create csv File trajectory docking position and #Create csv experiment_summary
-        trajectory_exists = os.path.exists('docking_position.csv')
+        trajectory_exists = os.path.exists(self.trajectory_file)
         if trajectory_exists:
             #append
-            self.csv_file = open('docking_position.csv', 'a', newline='')
+            self.csv_file = open(self.trajectory_file, 'a', newline='')
             self.csv_writer = csv.writer(self.csv_file)
         else:
             #write
-            self.csv_file = open('docking_position.csv', 'w', newline='')
+            self.csv_file = open(self.trajectory_file, 'w', newline='')
             self.csv_writer = csv.writer(self.csv_file)
             self.csv_writer.writerow([
                 'run_id',
@@ -129,14 +133,18 @@ class ImagePublisherNode(Node):
                 'error_z'
             ])
 
-        summary_exists = os.path.exists('experiment_summary.csv')
+
+        self.declare_parameter('summary_file',"../experiments/experiment_result/experiment_summary.csv")
+        self.summary_file = self.get_parameter('summary_file').value
+
+        summary_exists = os.path.exists(self.summary_file)
         if summary_exists:
             #append
-            self.exp_sum_file = open('experiment_summary.csv', 'a', newline='')
+            self.exp_sum_file = open(self.summary_file, 'a', newline='')
             self.exp_sum_writer = csv.writer(self.exp_sum_file)
         else:
             #write
-            self.exp_sum_file = open('experiment_summary.csv', 'w', newline='')
+            self.exp_sum_file = open(self.summary_file, 'w', newline='')
             self.exp_sum_writer = csv.writer(self.exp_sum_file)
             self.exp_sum_writer.writerow([
                 'run_id',

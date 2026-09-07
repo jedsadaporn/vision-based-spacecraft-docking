@@ -1,67 +1,159 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 df = pd.read_csv("docking_position.csv")
 
-plt.plot(df["time"], df["x"], label="x")
-plt.plot(df["time"], df["y"], label="y")
-plt.plot(df["time"], df["z"], label="z")
+print(df.groupby(["trial_id", "run_id"]).size())
 
-plt.xlabel("Time (s)")
-plt.ylabel("State")
-plt.title("Spacecraft State")
+#Prove CSV have TC1-TC3
+# print(df["trial_id"].unique())
+print(df.groupby("trial_id").size())
+
+plt.figure()
+for trial_id in [1, 2, 3]:
+    trial = df[df["trial_id"] == trial_id]
+
+    # trajectory
+    # plt.plot(trial["x"], trial["y"], label="Trajectory")
+    plt.plot(
+    trial["x"],
+    trial["y"],
+    label=f"TC{trial_id}"
+    )
+
+    # start point
+    # plt.scatter(
+    #     trial.iloc[0]["x"],
+    #     trial.iloc[0]["y"],
+    #     label=f"TC{trial_id}"
+    # )
+
+# docking target
+plt.scatter(0, 0, label="Docking Target")
+plt.xlabel("X Axis")
+plt.ylabel("Y Axis")
+plt.title("X-Y trajectory")
 plt.legend()
 plt.grid()
-
 plt.show()
 
 plt.figure()
+for trial_id in [1, 2, 3]:
+    trial = df[df["trial_id"] == trial_id]
 
-plt.plot(df["time"], df["error_x"], label="error_x")
-plt.plot(df["time"], df["error_y"], label="error_y")
-plt.plot(df["time"], df["error_z"], label="error_z")
-
-plt.axhline(0, linestyle="--")
+    plt.plot(
+        trial["time"],
+        trial["x"],
+        label=f"TC{trial_id}"
+    )
+    # plt.plot(trial["time"], trial["y"], label="y")
+    # plt.plot(trial["time"], trial["z"], label="z")
 
 plt.xlabel("Time (s)")
-plt.ylabel("Error")
-plt.title("Docking Error")
+plt.ylabel("X Position")
+plt.title("X Position vs Time")
 plt.legend()
 plt.grid()
+plt.show()
 
+plt.figure()
+for trial_id in [1, 2, 3]:
+    trial = df[df["trial_id"] == trial_id]
+
+    plt.plot(
+        trial["time"],
+        trial["y"],
+        label=f"TC{trial_id}"
+    )
+
+plt.xlabel("Time (s)")
+plt.ylabel("Y Position")
+plt.title("Y Position vs Time")
+plt.legend()
+plt.grid()
+plt.show()
+
+plt.figure()
+for trial_id in [1, 2, 3]:
+    trial = df[df["trial_id"] == trial_id]
+
+    plt.plot(
+        trial["time"],
+        trial["z"],
+        label=f"TC{trial_id}"
+    )
+
+plt.xlabel("Time (s)")
+plt.ylabel("Z Position")
+plt.title("Z Position vs Time")
+plt.legend()
+plt.grid()
 plt.show()
 
 tolerance_x = 1.0
 tolerance_y = 1.0
 tolerance_z = 0.05
 
-docked = (
-    (df["error_x"].abs() < tolerance_x) &
-    (df["error_y"].abs() < tolerance_y) &
-    (df["error_z"].abs() < tolerance_z)
-)
+plt.figure()
+for trial_id in [1, 2, 3]:
+    trial = df[df["trial_id"] == trial_id]
 
-if docked.any():
-
-    first_dock_index = docked.idxmax()
-    dock_time = df.loc[first_dock_index, "time"]
-
-    print("Initial state:")
-    print(
-        df.iloc[0]["x"],
-        df.iloc[0]["y"],
-        df.iloc[0]["z"]
+    # Find Error Magnitude
+    error_magnitude = np.sqrt(
+        trial["error_x"]**2 +
+        trial["error_y"]**2 +
+        trial["error_z"]**2
     )
 
-    print("Docking state:")
-    print(
-        df.loc[first_dock_index, "x"],
-        df.loc[first_dock_index, "y"],
-        df.loc[first_dock_index, "z"]
+    # plt.plot(trial["time"], trial["error_x"], label="error_x")
+    # plt.plot(trial["time"], trial["error_y"], label="error_y")
+    # plt.plot(trial["time"], trial["error_z"], label="error_z")
+
+    plt.plot(
+        trial["time"],
+        error_magnitude,
+        label=f"TC{trial_id}"
     )
 
-    print("Time to dock:", dock_time, "seconds")
+    docked = (
+        (trial["error_x"].abs() < tolerance_x) &
+        (trial["error_y"].abs() < tolerance_y) &
+        (trial["error_z"].abs() < tolerance_z)
+    )
 
-else:
-    print("Docking condition was not reached.")
+    if docked.any():
+
+        first_dock_index = docked.idxmax()
+        dock_time = trial.loc[first_dock_index, "time"]
+
+        print("Initial state:")
+        print(
+            trial.iloc[0]["x"],
+            trial.iloc[0]["y"],
+            trial.iloc[0]["z"]
+        )
+
+        print("Docking state:")
+        print(
+            trial.loc[first_dock_index, "x"],
+            trial.loc[first_dock_index, "y"],
+            trial.loc[first_dock_index, "z"]
+        )
+
+        print("Time to dock:", dock_time, "seconds")
+
+    else:
+        print("Docking condition was not reached.")
+
+
+# plt.axhline(0, linestyle="--")
+
+plt.xlabel("Time (s)")
+plt.ylabel("Position Error Magnitude")
+plt.title("Position Error Magnitude vs Time")
+plt.legend()
+plt.grid()
+
+plt.show()
