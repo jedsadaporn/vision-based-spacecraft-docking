@@ -1,3 +1,29 @@
+ros2 setup project
+cd ~/space_robotics/vision-based-spacecraft-docking
+mkdir -p ros2_ws/src/docking_gazebo/docking_gazebo
+mkdir -p ros2_ws/src/docking_gazebo/resource
+
+#Create __init__.py
+touch ros2_ws/src/docking_gazebo/docking_gazebo/__init__.py
+
+#Create Resource Maker
+touch ros2_ws/src/docking_gazebo/resource/docking_gazebo
+
+#Create package.xml
+cd ~/space_robotics/vision-based-spacecraft-docking
+nano ros2_ws/src/docking_gazebo/package.xml
+
+#Create setup.py
+nano ros2_ws/src/docking_gazebo/setup.py
+
+#Create setup.cfg
+nano ros2_ws/src/docking_gazebo/setup.cfg
+
+#setup gazebo
+cd ~/space_robotics/vision-based-spacecraft-docking
+mkdir -p ros2_ws/src/docking_gazebo/worlds
+nano ros2_ws/src/docking_gazebo/worlds/docking_world.world
+
 ~/space_robotics/vision-based-spacecraft-docking/ros2_ws$
 
 source /opt/ros/foxy/setup.bash
@@ -30,3 +56,13 @@ rm -rf build install log
 
 experiment
 cd ~/space_robotics/vision-based-spacecraft-docking/experiment
+
+Check Ros2 Version and ubuntu version
+echo $ROS_DISTRO
+lsb_release -a
+
+Check Gazebo Version
+which gazebo
+gazebo --version
+which gz
+gz --version

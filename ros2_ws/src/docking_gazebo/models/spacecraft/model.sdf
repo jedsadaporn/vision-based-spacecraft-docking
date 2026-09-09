@@ -1,0 +1,44 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+
+  <model name="spacecraft">
+
+    <static>false</static>
+
+    <link name="body">
+
+      <inertia>
+        <!-- <mass>10</mass> -->
+        <ixx>0.375</ixx>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyy>0.9083</iyy>
+        <iyz>0.0</iyz>
+        <izz>1.1333</izz>
+    </inertia>
+
+      <visual name="body_visual">
+        <!-- geometry -->
+        <geometry>
+          <box>
+            <size>1.0 0.6 0.3</size>
+          </box>
+        </geometry>
+        <!-- material -->
+        </visual>
+
+      <collision name="body_collision">
+        <!-- geometry -->
+        <geometry>
+          <box>
+            <size>1.0 0.6 0.3</size>
+          </box>
+        </geometry>
+      </collision>
+      
+
+    </link>
+
+  </model>
+
+</sdf>
