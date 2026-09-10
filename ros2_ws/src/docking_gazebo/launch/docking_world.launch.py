@@ -6,24 +6,7 @@ from launch.substitutions import PathJoinSubstitution
 
 
 def generate_launch_description():
-
-    gazebo = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            PathJoinSubstitution([
-                FindPackageShare('gazebo_ros'),
-                'launch',
-                'gazebo.launch.py'
-            ])
-        ),
-        launch_arguments={
-            'world': PathJoinSubstitution([
-                FindPackageShare('docking_gazebo'),
-                'worlds',
-                'docking_world.world'
-            ]),
-        }.items()
-    )
-
+    
     set_model_path = SetEnvironmentVariable(
         name='GAZEBO_MODEL_PATH',
         value = PathJoinSubstitution([
@@ -32,7 +15,24 @@ def generate_launch_description():
                 ])
     )
 
+    gazebo = IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                PathJoinSubstitution([
+                    FindPackageShare('gazebo_ros'),
+                    'launch',
+                    'gazebo.launch.py'
+                ])
+            ),
+            launch_arguments={
+                'world': PathJoinSubstitution([
+                    FindPackageShare('docking_gazebo'),
+                    'worlds',
+                    'docking_world.world'
+                ]),
+            }.items()
+        )
+
     return LaunchDescription([
-        gazebo,
-        set_model_path
+        set_model_path,
+        gazebo
     ])

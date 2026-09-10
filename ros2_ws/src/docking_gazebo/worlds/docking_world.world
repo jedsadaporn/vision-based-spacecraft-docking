@@ -15,5 +15,10 @@
       <pose>0 0 0.3 0 0 0</pose>
     </include>
 
+    <include>
+      <uri>model://docking_target</uri>
+      <pose> 3.0 0 0.3 0 0 0 </pose>
+    </include>
+
   </world>
 </sdf>

@@ -1,0 +1,48 @@
+docking_gazebo package
+
+docking_gazebo/
+├── launch/
+├── models/
+│   ├── spacecraft/
+│   └── docking_target/
+├── worlds/
+├── package.xml
+└── setup.py
+
+docking_vision
+      ↓
+algorithm / perception / controller
+
+docking_gazebo
+      ↓
+simulation environment
+
+Gazebo World
+โดยมี
+
+Ground
+Sun
+Spacecraft
+Docking Target
+
+ตำแหน่งปัจจุบันโดยแนวคิดคือ:
+
+Spacecraft                    Target
+    [🚀] ---------------------- [▯]
+     x=0                         x=3
+
+Camera Sensor 640 × 480
+Spacecraft
+┌───────────────┐
+│               │── Camera → +X
+└───────────────┘
+
+<sensor>
+    <update_rate>
+        ↓
+    "Gazebo camera สร้าง frame บ่อยแค่ไหน"
+
+<plugin>
+    <updateRate>
+        ↓
+    "ROS camera plugin publish อย่างไร"

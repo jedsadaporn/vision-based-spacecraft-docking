@@ -1,0 +1,70 @@
+ros2 setup project
+cd ~/space_robotics/vision-based-spacecraft-docking
+mkdir -p ros2_ws/src/docking_gazebo/docking_gazebo
+mkdir -p ros2_ws/src/docking_gazebo/resource
+
+#Create __init__.py
+touch ros2_ws/src/docking_gazebo/docking_gazebo/__init__.py
+
+#Create Resource Maker
+touch ros2_ws/src/docking_gazebo/resource/docking_gazebo
+
+#Create package.xml
+cd ~/space_robotics/vision-based-spacecraft-docking
+nano ros2_ws/src/docking_gazebo/package.xml
+
+#Create setup.py
+nano ros2_ws/src/docking_gazebo/setup.py
+
+#Create setup.cfg
+nano ros2_ws/src/docking_gazebo/setup.cfg
+
+#setup gazebo
+cd ~/space_robotics/vision-based-spacecraft-docking
+mkdir -p ros2_ws/src/docking_gazebo/worlds
+nano ros2_ws/src/docking_gazebo/worlds/docking_world.world
+
+~/space_robotics/vision-based-spacecraft-docking/ros2_ws$
+
+source /opt/ros/foxy/setup.bash
+source ~/space_robotics/vision-based-spacecraft-docking/ros2_ws/install/setup.bash
+
+ros2 pkg list | grep docking
+
+colcon build
+source install/setup.bash
+
+Check Gazebo Version
+which gazebo
+gazebo --version
+which gz
+gz --version
+
+Check Validate Before Build
+gz sdf -k ros2_ws/src/docking_gazebo/models/docking_target/model.sdf
+gz sdf -k src/docking_gazebo/models/docking_target/model.sdf
+
+Validate Instal file
+grep -n '<model name\|<static>' \
+install/docking_gazebo/share/docking_gazebo/models/docking_target/model.sdf
+
+grep -n '<name>' \
+install/docking_gazebo/share/docking_gazebo/models/docking_target/model.config
+
+kill Gazebo
+kill %1
+
+check camera topic
+ros2 topic list | grep camera
+
+check image_raw info topic
+ros2 topic info /spacecraft_camera/image_raw
+
+check image_raw hz topic
+ros2 topic hz /spacecraft_camera/image_raw
+
+check image from camera by rqt
+ros2 run rqt_image_view rqt_image_view
+
+ ros2 launch docking_gazebo docking_world.launch.py
+

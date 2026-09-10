@@ -8,14 +8,14 @@
     <link name="body">
 
       <inertia>
-        <!-- <mass>10</mass> -->
+        <mass>10</mass>
         <ixx>0.375</ixx>
         <ixy>0.0</ixy>
         <ixz>0.0</ixz>
         <iyy>0.9083</iyy>
         <iyz>0.0</iyz>
         <izz>1.1333</izz>
-    </inertia>
+      </inertia>
 
       <visual name="body_visual">
         <!-- geometry -->
@@ -35,6 +35,23 @@
           </box>
         </geometry>
       </collision>
+
+      <sensor name="spacecraft_camera" type="camera">
+        <pose>0.5 0 0 0 0 0</pose>
+        <camera>
+            <image>
+            <width>640</width>
+            <height>480</height>
+          </image>
+        </camera>
+        <plugin name="spacecraft_camera" filename="libgazebo_ros_camera.so">
+            <cameraName>spacecraft_camera</cameraName>
+            <frameName>camera_link</frameName>
+            <imageTopicName>camera/image_raw</imageTopicName>
+            <!-- frq = 10hz = update rate -->
+            <updateRate>10</updateRate>
+        </plugin>
+      </sensor>
       
 
     </link>

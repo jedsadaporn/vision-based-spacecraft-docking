@@ -30,6 +30,11 @@ setup(
             glob('models/spacecraft/model.sdf') + glob('models/spacecraft/model.config'),
             
         ),
+        (
+            os.path.join('share', package_name, 'models/docking_target'),
+            glob('models/docking_target/model.sdf') + glob('models/docking_target/model.config'),
+            
+        ),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
