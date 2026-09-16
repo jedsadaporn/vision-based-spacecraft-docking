@@ -56,6 +56,10 @@
 
     </link>
 
+    <plugin name="spacecraft_cmd_vel_plugin"
+        filename="libspacecraft_cmd_vel_plugin.so">
+    </plugin>
+
   </model>
 
 </sdf>

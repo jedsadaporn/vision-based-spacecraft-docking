@@ -46,3 +46,62 @@ Spacecraft
     <updateRate>
         ↓
     "ROS camera plugin publish อย่างไร"
+
+เดิม:
+image_detector
+      ↓
+ /cmd_vel
+      ↓
+image_publisher
+      ↓
+synthetic state
+
+
+ใหม่:
+image_detector
+      ↓
+ /cmd_vel
+      ↓
+Gazebo spacecraft
+      ↓
+Gazebo camera
+      ↓
+/spacecraft_camera/image_raw
+      ↓
+image_detector
+
+
+CustomSpacecraftController
+│
+├── 1. ROS subscriber
+│      └── /cmd_vel
+│
+├── 2. เก็บ velocity command ล่าสุด
+│      └── vx, vy, vz
+│
+└── 3. Gazebo update callback
+       └── เอา vx,vy,vz ไปกำหนด motion
+       
+OnCmdVel() = รับ command
+OnUpdate() = นำ command ล่าสุดไปใช้กับ Gazebo
+controller.py = ไม่ต้องถูกเรียกจาก plugin
+
+ROS 2 Python nodes
+        │
+        │ /cmd_vel
+        ▼
+Gazebo C++ ModelPlugin
+        │
+        ▼
+Gazebo spacecraft
+        │
+        ▼
+Gazebo camera
+        │
+        ▼
+/camera/image_raw
+
+.so มีอยู่ → ✅
+dependencies ครบ → ✅
+installed model.sdf มี plugin → ✅
+build ผ่าน → ✅

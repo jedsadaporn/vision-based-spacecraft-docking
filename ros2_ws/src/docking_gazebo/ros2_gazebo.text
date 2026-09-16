@@ -66,5 +66,20 @@ ros2 topic hz /spacecraft_camera/image_raw
 check image from camera by rqt
 ros2 run rqt_image_view rqt_image_view
 
- ros2 launch docking_gazebo docking_world.launch.py
+Remap //bc ros2 image_detector.py sub from /camera/image_raw but gazebo output is:=/spacecraft_camera/image_raw
+ros2 run docking_vision image_detector \ --ros-args \ -r /camera/image_raw:=/spacecraft_camera/image_raw
+
+Find Plugin
+ls /opt/ros/foxy/lib | grep gazebo_ros
+find /opt/ros/foxy/lib -maxdepth 1 -type f | grep gazebo
+
+info plugin with topic/interface
+ros2 pkg prefix gazebo_plugins
+grep -R "planar_move" /opt/ros/foxy/share/gazebo_plugins 2>/dev/null
+grep -R "cmd_vel" /opt/ros/foxy/share/gazebo_plugins 2>/dev/null
+grep -n -A20 -B5 "planar_move" \
+/opt/ros/foxy/share/gazebo_plugins/worlds/gazebo_ros_planar_move_demo.world
+    
+Run Gazebo
+ros2 launch docking_gazebo docking_world.launch.py
 
